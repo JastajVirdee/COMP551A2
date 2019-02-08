@@ -1,0 +1,1 @@
+The data is relatively heavy. To avoid slowing down the git system, we don't source control it. On your machine, you should have the data folder, and train/test folders in your data folder. Don't push to the origin though. 
