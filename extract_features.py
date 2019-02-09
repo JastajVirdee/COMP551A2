@@ -30,7 +30,7 @@ def load_raw_data():
     all_words=[]
     for foldername in ['pos', 'neg']:
         file_list=os.listdir('data/train/'+ foldername)
-        for fname in file_list[0:1000]:
+        for fname in file_list[0:1200]:
             path='data/train/'+foldername+'/'+fname
             #f=open('data/train/pos/0_9.txt')
             f=open(path)
@@ -75,7 +75,7 @@ review_list=[]
 features=pd.DataFrame()
 targets=pd.DataFrame()
 
-buffer_size=10;
+buffer_size=200;
 
 for i in range(len(documents)):
 
@@ -83,7 +83,8 @@ for i in range(len(documents)):
     feat_list.append(feat)
     review_list.append(review_list)
     
-    if i % buffer_size == 0:
+    if i % buffer_size == 0 or i==(len(documents)-1):
+        print(i)
         feat_df=pd.DataFrame.from_dict(feat_list)
         features=features.append(feat_df)   
         feat_list=[]
