@@ -24,13 +24,14 @@ import pandas as pd
 #file_list=os.listdir('data/train/pos')
 porter = nltk.PorterStemmer()
 num_top_words=2000;
+num_files_to_read_per_sent=100;
 
 def load_raw_data():
     documents=[]
     all_words=[]
     for foldername in ['pos', 'neg']:
         file_list=os.listdir('data/train/'+ foldername)
-        for fname in file_list[0:1200]:
+        for fname in file_list[0:num_files_to_read_per_sent]:
             path='data/train/'+foldername+'/'+fname
             #f=open('data/train/pos/0_9.txt')
             f=open(path)
@@ -42,6 +43,7 @@ def load_raw_data():
     return documents, all_words
 
 documents, all_words=load_raw_data()
+
 
 
 all_words = nltk.FreqDist(w.lower() for w in all_words)
@@ -73,7 +75,7 @@ start = time.time()
 feat_list=[]
 review_list=[]
 features=pd.DataFrame()
-targets=pd.DataFrame()
+reviews=pd.DataFrame()
 
 buffer_size=200;
 
@@ -84,9 +86,12 @@ for i in range(len(documents)):
     review_list.append(review_list)
     
     if i % buffer_size == 0 or i==(len(documents)-1):
-        print(i)
+        end=time.time()
+        print("Example {}, current time taken: {}".format(i, end-start))
         feat_df=pd.DataFrame.from_dict(feat_list)
+        review_df=pd.DataFrame.from_dict(review_list)
         features=features.append(feat_df)   
+        reviews=reviews.append(review_df)
         feat_list=[]
         review_list=[]
 
