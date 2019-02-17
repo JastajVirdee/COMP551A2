@@ -34,7 +34,8 @@ X_train, X_val, y_train, y_val = train_test_split(corpus, reviews, train_size=0.
 #comparisons could be interesting
 lemma_vect = CountVectorizer(tokenizer=MyTokenizer()) #Use a lemmatizer, add to the countvectorizer
 
-
+myVectorizer=lemma_vect
+myVectorizer=CountVectorizer()
 #Compare classifiers on this dataset with this lemmatization, 
 #Very similar to what is done at the scikit learn link below
 #https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html
@@ -59,7 +60,7 @@ def model_comparison_with_tfidf():
         """Here a 'pipeline' is created using the classifiers in the classifiers array
         Classfier is varied, all else is the same"""
         pclf = Pipeline([ #create sequence of transforms and classifier
-        ('vect', lemma_vect),
+        ('vect', myVectorizer),
         ('tfidf', TfidfTransformer()),
         ('norm', Normalizer()),
         ('clf', clf),
@@ -84,7 +85,7 @@ def model_comparison_with_word_count():
         """Here a 'pipeline' is created using the classifiers in the classifiers array
         Classfier is varied, all else is the same"""
         pclf = Pipeline([ #create sequence of transforms and classifier
-        ('vect', lemma_vect),
+        ('vect', myVectorizer),
         ('norm', Normalizer()),
         ('clf', clf),
         ])
@@ -141,7 +142,7 @@ def decision_tree_comparison():
     for i, (name, clf) in enumerate(zip(names, classifiers)): 
         """Note how I throw out the tf_idf transform"""
         pclf = Pipeline([
-        ('vect', lemma_vect),
+        ('vect', myVectorizer),
         ('norm', Normalizer()),
         ('clf', clf),
         ])
