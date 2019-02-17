@@ -130,7 +130,7 @@ tfidf_vs_word_count()
 
 depths=np.linspace(10,100,10)
 names=["{}".format(i) for i in depths]
-classifiers=[DecisionTreeClassifier(max_depth=5) for i in depths]
+classifiers=[DecisionTreeClassifier(max_depth=i) for i in depths]
 
 
 
