@@ -59,7 +59,7 @@ def model_comparison_with_tfidf():
         """Here a 'pipeline' is created using the classifiers in the classifiers array
         Classfier is varied, all else is the same"""
         pclf = Pipeline([ #create sequence of transforms and classifier
-        ('vect', lemma_vect()),
+        ('vect', lemma_vect),
         ('tfidf', TfidfTransformer()),
         ('norm', Normalizer()),
         ('clf', clf),
@@ -84,7 +84,7 @@ def model_comparison_with_word_count():
         """Here a 'pipeline' is created using the classifiers in the classifiers array
         Classfier is varied, all else is the same"""
         pclf = Pipeline([ #create sequence of transforms and classifier
-        ('vect', lemma_vect()),
+        ('vect', lemma_vect),
         ('norm', Normalizer()),
         ('clf', clf),
         ])
@@ -117,10 +117,11 @@ def tfidf_vs_word_count():
     ax.set_xlabel('Model')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(names)
+    ax.legend()
 
 
 """Pull the trigger to compute all that stuff"""
-#tfidf_vs_word_count()
+tfidf_vs_word_count()
 
 
 #Now let us home in on the decision tree. 
