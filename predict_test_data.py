@@ -6,53 +6,53 @@ Created on Wed Feb 20 14:33:35 2019
 @author: vassili
 """
 
-import os
-
 #TRAIN MODEL
-from extract_features import MyTokenizer, load_raw_data
+from extract_features import load_raw_data
 import numpy as np
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
 
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-
-from sklearn.metrics import accuracy_score
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import GridSearchCV
 
 from matplotlib import pyplot as plt
 
 
-corpus, reviews=load_raw_data(num_files_to_read_per_sent=4000) #HOW MANY FILES TO LOAD
+corpus, reviews=load_raw_data(num_files_to_read_per_sent=12500) #HOW MANY FILES TO LOAD
 
-X_train, X_val, y_train, y_val = train_test_split(corpus, reviews, train_size=0.8, test_size=0.2)
-
-lemma_vect = CountVectorizer(tokenizer=MyTokenizer()) #Use a lemmatizer, add to the countvectorizer
-
-myVectorizer=CountVectorizer()
-
+vectorizer=TfidfVectorizer()
+c_vect = vectorizer.fit(corpus)
+X=c_vect.transform(corpus)
+Y=reviews;
 
 
-clf= MultinomialNB()
+param_grid = {'clf__C': [1e3, 5e3, 1e4, 5e4, 1e5],
+              'clf__gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], }
+
+C_arr=np.linspace(0.1, 4, 50)
+
+param_grid = {'clf__C': C_arr.tolist()}
+
+
 pclf = Pipeline([ #create sequence of transforms and classifier
-('vect', myVectorizer),
-('tfidf', TfidfTransformer()),
-('norm', Normalizer()),
-('clf', clf),
+    ('norm', Normalizer()),
+    ('clf', LinearSVC())
 ])
 
 
-pclf.fit(X_train, y_train)
-y_pred = pclf.predict(X_val)
 
-
-
-score = accuracy_score(y_val, y_pred)
-print("Accuracy:{}".format(score))
+pclf=GridSearchCV(pclf, param_grid, cv=4, verbose=1)
+pclf.fit(X, Y)
+max_idx=np.argmax(pclf.cv_results_['mean_test_score'])
+plt.figure()
+plt.plot(C_arr, pclf.cv_results_['mean_test_score'], label="Accuracy")
+plt.scatter(C_arr[max_idx], pclf.cv_results_['mean_test_score'][max_idx],color='r',
+            label="C={}".format(C_arr[max_idx]))
+plt.xlabel("C value", fontsize=13)
+plt.ylabel("Cross Validation Accuracy", fontsize=13)
+plt.savefig("LinearSVM_C_Comparison.pdf",bbox_inches='tight')
+plt.legend()
 
 
 
@@ -63,11 +63,12 @@ def read_test_data(nfiles):
         f=open(path)
         raw=f.read()
         test_corpus.append(raw)
+    test_corpus=c_vect.transform(test_corpus)
     return test_corpus
     
 nfiles=25000
 test_data=read_test_data(nfiles)
-y_pred = pclf.predict(test_data)
+y_pred = pclf.best_estimator_.predict(test_data)
 
 idxs=np.arange(nfiles)
 pred_mat=np.array([idxs, y_pred]).T
