@@ -25,7 +25,6 @@ from matplotlib import pyplot as plt
 
 
 
-"""Get back data matrices for the pos/neg examples. """
 corpus, reviews=load_raw_data(num_files_to_read_per_sent=4000) #HOW MANY FILES TO LOAD
 
 X_train, X_val, y_train, y_val = train_test_split(corpus, reviews, train_size=0.8, test_size=0.2)
@@ -117,10 +116,11 @@ def tfidf_vs_word_count():
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(names)
     ax.legend()
+    plt.savefig('tfidf_vs_wordcount_comparison.pdf', bbox_inches='tight')
 
 
 """Pull the trigger to compute all that stuff"""
-#tfidf_vs_word_count()
+tfidf_vs_word_count()
 
 
 
@@ -145,11 +145,11 @@ def decision_tree_comparison(namess,classifierss):
         i=i+1
     return accuracies
 
-def decision_tree_comparison_plot(namess,classifierss):
+def decision_tree_comparison_plot(names,classifiers):
 #Plotting barcharts with two rectangles:
 #cannibalized off https://matplotlib.org/gallery/statistics/barchart_demo.html
     """Plot accuracy of decision tree as a function of decision tree depth"""
-    accuracies=decision_tree_comparison(namess,classifierss)
+    accuracies=decision_tree_comparison(names,classifiers)
     
     index = np.arange(len(names))
     
@@ -164,12 +164,13 @@ def decision_tree_comparison_plot(namess,classifierss):
     ax.set_xticks(index)
     ax.set_xticklabels(names)
     plt.show()
+    plt.savefig('DecisionTreeComparison.pdf', bbox_inches='tight')
     return(accuracies)
 
 
 
 
-#decision_tree_comparison_plot()
+decision_tree_comparison_plot(names, classifiers)
 
 
 # COMPARE TF-IDF VS JUST WORD COUNT ON ONLY ONE MODEL (MULTINOMIALNB)
@@ -261,3 +262,4 @@ ax.set_xlabel('Model')
 ax.set_xticks(index)
 ax.set_xticklabels(names)
 plt.show()
+plt.savefig('AllModelComparison.pdf', bbox_inches='tight')
