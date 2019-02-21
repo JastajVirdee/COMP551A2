@@ -8,7 +8,7 @@ Created on Thu Feb 21 12:24:16 2019
 Compare the Linear SVC grid search with different data preprocessing techniques. 
 """
 
-
+from extract_features import MyTokenizer
 from sklearn.model_selection import GridSearchCV
 from extract_features import load_raw_data
 from sklearn.pipeline import Pipeline
@@ -32,7 +32,6 @@ pclf_glob = Pipeline([ #create sequence of transforms and classifier
 ])
 
 def evaluate_vectorizer(vectorizer):
-    vectorizer=TfidfVectorizer()
     c_vect = vectorizer.fit(corpus)
     X=c_vect.transform(corpus)
     Y=reviews
@@ -45,23 +44,33 @@ def evaluate_vectorizer(vectorizer):
     max_idx=np.argmax(pclf.cv_results_['mean_test_score'])
     return scores, max_idx
 
-#can also add lemma_vect = CountVectorizer(tokenizer=MyTokenizer())
+def plot_vectorizer_comparison(feature_extraction_names, vectorizers, figname):
+    for (name, vectorizer) in zip(feature_extraction_names,vectorizers):
+        scores, max_idx=evaluate_vectorizer(vectorizer)
+        plt.plot(C_arr, scores, label=name)
+        plt.scatter(C_arr[max_idx], scores[max_idx],
+                    label=name+" C={:10.4f}".format(C_arr[max_idx]))
+        
+        plt.xlabel("C value", fontsize=13)
+        plt.ylabel("Cross Validation Accuracy", fontsize=13)
+        plt.savefig(figname+'.pdf',bbox_inches='tight')
+        plt.legend()
+
+#can also add 
 #for lemmatizer comparison.. todo?
-feature_extraction_names=["TF-IDF", "Count"]
-vectorizers=[TfidfVectorizer(), CountVectorizer()]
+names=["TF-IDF", "Count"]
+vects=[TfidfVectorizer(), CountVectorizer()]
+plot_vectorizer_comparison(names, vects, 'LinSVM_TFIDFvsCount')
 
-plt.figure()
 
-for (name, vectorizer) in zip(feature_extraction_names,vectorizers):
-    scores, max_idx=evaluate_vectorizer(vectorizer)
-    plt.plot(C_arr, scores, label=name)
-    plt.scatter(C_arr[max_idx], scores[max_idx],
-                label=name+" C={:10.4f}".format(C_arr[max_idx]))
-    
-    plt.xlabel("C value", fontsize=13)
-    plt.ylabel("Cross Validation Accuracy", fontsize=13)
-    plt.savefig("LinearSVM_C_Comparison_vs_Features.pdf",bbox_inches='tight')
-    plt.legend()
+lemma_count = CountVectorizer(tokenizer=MyTokenizer())
+lemma_tfidf = TfidfVectorizer(tokenizer=MyTokenizer())
+names=["TF-IDF", "Count"]
+vects=[lemma_tfidf, lemma_count]
+
+#plot_vectorizer_comparison(names, vects, 'LinSVM_TFIDFvsCount_Lemma')
+
+
 
 
 
