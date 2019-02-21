@@ -16,7 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Normalizer
 
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 
 from sklearn.metrics import accuracy_score
@@ -25,7 +25,7 @@ from matplotlib import pyplot as plt
 
 
 
-corpus, reviews=load_raw_data(num_files_to_read_per_sent=4000) #HOW MANY FILES TO LOAD
+corpus, reviews=load_raw_data(num_files_to_read_per_sent=12500) #HOW MANY FILES TO LOAD
 
 X_train, X_val, y_train, y_val = train_test_split(corpus, reviews, train_size=0.8, test_size=0.2)
 
@@ -38,13 +38,13 @@ myVectorizer=CountVectorizer()
 #Compare classifiers on this dataset with this lemmatization, 
 #Very similar to what is done at the scikit learn link below
 #https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html
-names=["MultinomialNB", "SVM, lin kern", "SVM, gamma"]
+names=["MultinomialNB", "Linear SVM", "RBF SVM"]
 classifiers=[
         MultinomialNB(),
-        SVC(kernel="linear", C=0.025),
-        SVC(gamma=2, C=1)
+        LinearSVC(C=0.25918),
+        SVC(C=0.25918),
+        DecisionTreeClassifier()
         ]
-
 
 """Using TF IDF Features"""
 def model_comparison_with_tfidf():
@@ -57,7 +57,7 @@ def model_comparison_with_tfidf():
         """Here a 'pipeline' is created using the classifiers in the classifiers array
         Classfier is varied, all else is the same"""
         pclf = Pipeline([ #create sequence of transforms and classifier
-        ('vect', myVectorizer),
+        ('vect', CountVectorizer()),
         ('tfidf', TfidfTransformer()),
         ('norm', Normalizer()),
         ('clf', clf),
@@ -119,58 +119,10 @@ def tfidf_vs_word_count():
     plt.savefig('tfidf_vs_wordcount_comparison.pdf', bbox_inches='tight')
 
 
+
 """Pull the trigger to compute all that stuff"""
 tfidf_vs_word_count()
 
-
-
-
-def decision_tree_comparison(namess,classifierss):
-    """The following function compares """
-    accuracies=np.ones(len(names))
-    i=0
-    for i, (name, clf) in enumerate(zip(namess, classifierss)):
-        """Note how I throw out the tf_idf transform"""
-        pclf = Pipeline([
-        ('vect', myVectorizer),
-        ('norm', Normalizer()),
-        ('clf', clf),
-        ])
-        pclf.fit(X_train, y_train)
-        y_pred = pclf.predict(X_val)
-        score = accuracy_score(y_val, y_pred)
-        # print("Model results for {}".format(name))
-        # print("Accuracy:{}".format(score))
-        accuracies[i]=score
-        i=i+1
-    return accuracies
-
-def decision_tree_comparison_plot(names,classifiers):
-#Plotting barcharts with two rectangles:
-#cannibalized off https://matplotlib.org/gallery/statistics/barchart_demo.html
-    """Plot accuracy of decision tree as a function of decision tree depth"""
-    accuracies=decision_tree_comparison(names,classifiers)
-    
-    index = np.arange(len(names))
-    
-    bar_width = 0.35
-    
-    fig = plt.figure()
-    ax=plt.gca()
-    rects = ax.bar(index, accuracies, bar_width, color='b',label='Dec_tree')
-    
-    ax.set_ylabel('Accuracy')
-    ax.set_xlabel('Model')
-    ax.set_xticks(index)
-    ax.set_xticklabels(names)
-    plt.show()
-    plt.savefig('DecisionTreeComparison.pdf', bbox_inches='tight')
-    return(accuracies)
-
-
-
-
-decision_tree_comparison_plot(names, classifiers)
 
 
 # COMPARE TF-IDF VS JUST WORD COUNT ON ONLY ONE MODEL (MULTINOMIALNB)
@@ -202,24 +154,6 @@ score_wordcount = accuracy_score(y_val, y_pred) #HERE DEFINE WHAT SCORE U USE
 print("Results for word count only {}".format(name))
 print("Accuracy:{}".format(score_wordcount))
 
-# after having ran the code we determined that tf-idf is the superior feature extraction method
-
-
-# USING ONLY ONE FEATURE EXTRACTION METHOD, COMPARE VARIOUS DECISION TREE MODELS TO GET THE BEST ONE
-accuracies=[]
-depths=[1+i for i in range(25)]
-names=["{}".format(i) for i in depths]
-classifiers=[DecisionTreeClassifier(max_depth=i) for i in depths]
-names.append("{inf}")
-classifiers.append(DecisionTreeClassifier()) # appending tree with unlimited depth
-# Searching for the best tree
-
-accuracies = list(decision_tree_comparison_plot(names,classifiers))
-
-best_tree_depth = accuracies.index(max(accuracies))
-if best_tree_depth==25:
-    best_tree_depth = None
-print("The decision tree with the highest accuracy has depth: ",best_tree_depth)
 
 
 # (USING TF-IDF EXTRACTION METHOD) COMPARE BEST DECISION TREES, SVCS, AND MULTINOMIAL

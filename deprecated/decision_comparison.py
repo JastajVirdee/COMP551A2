@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 20 14:48:47 2019
+Created on Wed Feb 20 17:39:08 2019
 
 @author: vassili
 """
@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import Normalizer
 
-
+from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from sklearn.svm import SVC, LinearSVC
 from matplotlib import pyplot as plt
@@ -29,14 +29,14 @@ Y=reviews;
 param_grid = {'clf__C': [1e3, 5e3, 1e4, 5e4, 1e5],
               'clf__gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], }
 
-C_arr=np.linspace(0.1, 4, 50)
+depth_arr=np.arange(1,30)
 
-param_grid = {'clf__C': C_arr.tolist()}
+param_grid = {'clf__max_depth': depth_arr.tolist()}
 
 
 pclf = Pipeline([ #create sequence of transforms and classifier
     ('norm', Normalizer()),
-    ('clf', LinearSVC())
+    ('clf', DecisionTreeClassifier())
 ])
 
 
@@ -45,16 +45,10 @@ pclf=GridSearchCV(pclf, param_grid, cv=4, verbose=1)
 pclf.fit(X, Y)
 max_idx=np.argmax(pclf.cv_results_['mean_test_score'])
 plt.figure()
-plt.plot(C_arr, pclf.cv_results_['mean_test_score'], label="Accuracy")
-plt.scatter(C_arr[max_idx], pclf.cv_results_['mean_test_score'][max_idx],color='r',
-            label="C={}".format(C_arr[max_idx]))
-plt.xlabel("C value", fontsize=13)
+plt.plot(depth_arr, pclf.cv_results_['mean_test_score'], label="Accuracy")
+plt.scatter(depth_arr[max_idx], pclf.cv_results_['mean_test_score'][max_idx],color='r',
+            label="Depth={}".format(depth_arr[max_idx]))
+plt.xlabel("Depth", fontsize=13)
 plt.ylabel("Cross Validation Accuracy", fontsize=13)
-plt.savefig("LinearSVM_C_Comparison.pdf",bbox_inches='tight')
+plt.savefig("Dec_Tree_Depth_Comparison.pdf",bbox_inches='tight')
 plt.legend()
-
-
-
-
-
-
