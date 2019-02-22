@@ -1,7 +1,16 @@
 import os, re, math, csv
 
-features = ['good', 'great', 'amazing', 'awesome', 'fantastic', 'oustanding', 'remarkable', 'unbelievable', 'excellent', 'brilliant', 
-'bad', 'horrible', 'disappointing', 'disaster', 'abysmal', 'painful', 'appalling', 'atrocious', 'awful', 'boring']
+features = ['acclaim', 'admire', 'amazing', 'awesome', 'beautiful', 'beauty', 'best', 'better', 'brilliant', 'charisma', 
+'complex', 'enjoy', 'enjoyable', 'enjoyed', 'entertaining', 'excellent', 'fabulous', 'fantastic', 'genuinely', 'glorious', 
+'inspiring', 'interesting', 'intelligent', 'good', 'great', 'like' 'love', 'memorable', 'nice', 'outstanding', 
+'perfectly', 'pleasant', 'pleasure', 'positive', 'quality', 'recommend', 'remarkable', 'rewarding', 'smart', 'special', 
+'star', 'strong', 'superbly', 'thumbs', 'touching', 'triumph', 'unbelievable', 'unique', 'very', 'well', 
+'absurd', 'abysmal', 'annoying', 'appalling', 'atrocious', 'average', 'awful', 'bad', 'boring', 'cliche', 
+'convoluted', 'crap', 'crappy', 'disappointing', 'disaster', 'disgusting', 'down', 'dumb', 'dumbest', 'excruciating', 
+'failed', 'fails', 'flawed', 'flaws', 'forcing', 'horrible', 'incredulous', 'irrelevant', 'lack', 'lacklustre', 
+'low', 'mess', 'not', 'overused', 'painful', 'poor', 'poorly', 'predictable', 'shit', 'stereotypical', 
+'stupid', 'unfortunately', 'waste', 'wasteful', 'weak', 'unbelievable', 'unconvincing', 'unimaginative', 'worthless', 'worst']
+
 
 def text_cleaner(string):
     """
@@ -46,8 +55,8 @@ def extract_test_data():
 def get_probabilities(data):
     '''Go through the data and get the feature and output probabilities'''
     y1 = total = 0
-    x_y1 = [0]*20
-    x_y0 = [0]*20
+    x_y1 = [0]*len(features)
+    x_y0 = [0]*len(features)
     for entry in data:
         total = total + 1
         if entry['pos'] == 1:
@@ -82,7 +91,6 @@ def predict(p_y1, p_x_y1, p_x_y0, text):
     for j in range(len(x)):
         sum = sum + (x[j]*math.log(p_x_y1[j]/p_x_y0[j], 10)) + ((1-x[j])*math.log((1-p_x_y1[j])/(1-p_x_y0[j]), 10))
     sum = sum + math.log(p_y1/(1-p_y1))
-    #print(sum)
     if sum >= 0:
         return 1
     else:
@@ -101,7 +109,7 @@ def train_accuracy(p_y1, p_x_y1, p_x_y0, data):
 train_data = extract_train_data()
 p_y1, p_x_y1, p_x_y0 = get_probabilities(train_data)
 
-accuracy = train_accuracy(p_y1, p_x_y1, p_x_y0, train_data)
+#accuracy = train_accuracy(p_y1, p_x_y1, p_x_y0, train_data)
 #print(accuracy)
 
 test_data = extract_test_data()
