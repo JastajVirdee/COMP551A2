@@ -29,8 +29,8 @@ X,Y=corpus, reviews
 lemma_count = CountVectorizer(tokenizer=MyTokenizer())
 lemma_tfidf = TfidfVectorizer(tokenizer=MyTokenizer())
 
-vectorizers=[CountVectorizer(), TfidfVectorizer, lemma_count, lemma_tfidf]
-
+names=["Count", "TFIDF", "CountLemm", "TFIDF_Lemm"]
+vectorizers=[CountVectorizer(), TfidfVectorizer(), lemma_count, lemma_tfidf]
 pclf_glob = Pipeline([ #create sequence of transforms and classifier
     ('norm', Normalizer()), #comment to try without normalization
     ('clf', LogisticRegression())
@@ -40,6 +40,24 @@ def evaluate_vectorizer(vectorizer):
     c_vect = vectorizer.fit(corpus)
     X=c_vect.transform(corpus)
     Y=reviews
-    return cross_val_score(pclf_glob, X, Y, cv=4)
-    
-evaluate_vectorizer(CountVectorizer())
+    scores=cross_val_score(pclf_glob, X, Y, cv=4)
+    return np.mean(scores)
+
+vec_scores=np.zeros(len(vectorizers))
+
+
+for i, vec in enumerate(vectorizers):
+    vec_scores[i]=evaluate_vectorizer(vectorizers[i])
+
+index = np.arange(len(names))
+bar_width = 0.5
+
+fig = plt.figure()
+ax = plt.gca()
+rects = ax.bar(index, vec_scores, bar_width, color='b')
+
+ax.set_ylabel('Accuracy')
+ax.set_xlabel('Feature Extraction method')
+ax.set_xticks(index)
+ax.set_xticklabels(names)
+plt.savefig('LogisticRegression_Comparison.pdf', bbox_inches='tight')

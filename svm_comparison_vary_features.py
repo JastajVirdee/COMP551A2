@@ -17,7 +17,7 @@ from sklearn.preprocessing import Normalizer
 
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
-from sklearn.svm import SVC, LinearSVC
+from sklearn.svm import LinearSVC
 from matplotlib import pyplot as plt
 
 corpus, reviews=load_raw_data(num_files_to_read_per_sent=12500) #HOW MANY FILES TO LOAD
