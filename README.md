@@ -21,4 +21,4 @@ The svm vs logistic regression comparison was generated using svm_vs_logistic_re
 Running the file will generate the figure. 
 
 ### Naive Bayes from scratch
-jastaj pls
+Running "naive_bayes.py" will create a Naive Bayes model using the training data (must be located as mentioned above). The model will then predict the test data (again must be located as mentioned above) and create and store the predictions in a "naive_bayes_predictions.csv" file. To see the accuracy of the model on the training data, remove the #'s from line 112 and 113.
