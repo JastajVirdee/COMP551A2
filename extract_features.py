@@ -44,7 +44,7 @@ def load_raw_data(num_files_to_read_per_sent):
 
 def construct_data_matrices():
     """Was initial version, here only for demosntraion/reference"""
-    corpus, reviews=load_raw_data(num_files_to_read_per_sent=4000) #HOW MANY FILES TO LOAD
+    corpus, reviews=load_raw_data(num_files_to_read_per_sent=100) #HOW MANY FILES TO LOAD
     X_train, X_val, y_train, y_val = train_test_split(corpus, reviews, train_size=0.8, test_size=0.2)
     
     lemma_vect = CountVectorizer(tokenizer=MyTokenizer()) #Use a lemmatizer, add to the countvectorizer
@@ -61,6 +61,7 @@ def construct_data_matrices():
     X_train_mat=hstack([X_train_counts, X_train_tfidf]).toarray()
     X_val_mat=hstack([X_val_counts, X_val_tfidf]).toarray()
     return X_train_mat, X_val_mat
+
 
 
 
